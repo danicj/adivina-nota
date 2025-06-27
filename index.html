@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>¿Qué nota es?</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+    .botones {
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      font-size: 18px;
+    }
+    #resultado {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>¿Qué nota es esta?</h1>
+  <canvas id="pentagrama" width="400" height="360"></canvas>
+
+  <div class="botones">
+    <button onclick="verificar('Do')">Do</button>
+    <button onclick="verificar('Re')">Re</button>
+    <button onclick="verificar('Mi')">Mi</button>
+    <button onclick="verificar('Fa')">Fa</button>
+    <button onclick="verificar('Sol')">Sol</button>
+    <button onclick="verificar('La')">La</button>
+    <button onclick="verificar('Si')">Si</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    const canvas = document.getElementById("pentagrama");
+    const ctx = canvas.getContext("2d");
+
+    const centerX = 200;
+    const lineSpacing = 20;  // ← Espaciado más cómodo
+    const middleLineY = 180; // ← Ajustado para el nuevo espaciado
+
+    const notas = [
+      { nombre: "Do", paso: -6 },
+      { nombre: "Re", paso: -5 },
+      { nombre: "Mi", paso: -4 },
+      { nombre: "Fa", paso: -3 },
+      { nombre: "Sol", paso: -2 },
+      { nombre: "La", paso: -1 },
+      { nombre: "Si", paso: 0 },
+      { nombre: "Do", paso: 1 },
+      { nombre: "Re", paso: 2 },
+      { nombre: "Mi", paso: 3 },
+      { nombre: "Fa", paso: 4 },
+      { nombre: "Sol", paso: 5 },
+      { nombre: "La", paso: 6 }
+    ];
+
+    let notaActual;
+
+    function dibujarPentagrama() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 2;
+      for (let i = -2; i <= 2; i++) {
+        const y = middleLineY + i * lineSpacing;
+        ctx.beginPath();
+        ctx.moveTo(40, y);
+        ctx.lineTo(360, y);
+        ctx.stroke();
+      }
+    }
+
+    function yDesdePaso(paso) {
+      return middleLineY - paso * (lineSpacing / 2);
+    }
+
+    function dibujarNota(nota) {
+      const y = yDesdePaso(nota.paso);
+
+      // Dibujar círculo de nota
+      ctx.beginPath();
+      ctx.arc(centerX, y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = "black";
+      ctx.fill();
+
+      // Dibujar líneas adicionales si es necesario
+		if (nota.paso <= -5) {
+		  for (let p = -6; p <= nota.paso; p += 2) {
+			const ly = yDesdePaso(p);
+			ctx.beginPath();
+			ctx.moveTo(centerX - 15, ly);
+			ctx.lineTo(centerX + 15, ly);
+			ctx.stroke();
+		  }
+		}
+
+		if (nota.paso >= 5) {
+		  for (let p = 6; p <= nota.paso; p += 2) {
+			const ly = yDesdePaso(p);
+			ctx.beginPath();
+			ctx.moveTo(centerX - 15, ly);
+			ctx.lineTo(centerX + 15, ly);
+			ctx.stroke();
+		  }
+		}
+    }
+
+    function nuevaNota() {
+      dibujarPentagrama();
+      notaActual = notas[Math.floor(Math.random() * notas.length)];
+      dibujarNota(notaActual);
+    }
+
+    function verificar(respuesta) {
+      const resultado = document.getElementById("resultado");
+      if (respuesta === notaActual.nombre) {
+        resultado.textContent = "¡Correcto!";
+        setTimeout(() => {
+          resultado.textContent = "";
+          nuevaNota();
+        }, 250);
+      } else {
+        resultado.textContent = "Incorrecto, intenta de nuevo.";
+      }
+    }
+
+    nuevaNota();
+  </script>
+</body>
+</html>
