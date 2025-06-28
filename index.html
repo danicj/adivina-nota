@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>¿Qué nota es?</title>
   <style>
     body {
@@ -9,19 +10,23 @@
       text-align: center;
       padding: 30px;
     }
+
     canvas {
       border: 1px solid #ccc;
       margin-bottom: 20px;
       background-color: #fff;
     }
+
     .botones {
       margin-top: 10px;
     }
+
     button {
       padding: 10px 15px;
       margin: 5px;
       font-size: 18px;
     }
+
     #resultado {
       margin-top: 20px;
       font-size: 20px;
@@ -29,6 +34,7 @@
     }
   </style>
 </head>
+
 <body>
   <h1>¿Qué nota es esta?</h1>
   <canvas id="pentagrama" width="400" height="360"></canvas>
@@ -50,7 +56,7 @@
     const ctx = canvas.getContext("2d");
 
     const centerX = 200;
-    const lineSpacing = 20;  // ← Espaciado más cómodo
+    const lineSpacing = 20; // ← Espaciado más cómodo
     const middleLineY = 180; // ← Ajustado para el nuevo espaciado
 
     const notas = [
@@ -66,10 +72,11 @@
       { nombre: "Mi", paso: 3 },
       { nombre: "Fa", paso: 4 },
       { nombre: "Sol", paso: 5 },
-      { nombre: "La", paso: 6 }
+      { nombre: "La", paso: 6 },
     ];
 
     let notaActual;
+    let notaAnterior = null;
 
     function dibujarPentagrama() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -96,31 +103,41 @@
       ctx.fillStyle = "black";
       ctx.fill();
 
-    // Dibujar líneas adicionales si es necesario
-    if (nota.paso <= -6) {
-      for (let p = -6; p <= nota.paso; p += 2) {
-        const ly = yDesdePaso(p);
-        ctx.beginPath();
-        ctx.moveTo(centerX - 15, ly);
-        ctx.lineTo(centerX + 15, ly);
-        ctx.stroke();
+      // Dibujar líneas adicionales si es necesario
+      if (nota.paso <= -6) {
+        for (let p = -6; p <= nota.paso; p += 2) {
+          const ly = yDesdePaso(p);
+          ctx.beginPath();
+          ctx.moveTo(centerX - 15, ly);
+          ctx.lineTo(centerX + 15, ly);
+          ctx.stroke();
+        }
+      }
+
+      if (nota.paso >= 5) {
+        for (let p = 6; p <= nota.paso; p += 2) {
+          const ly = yDesdePaso(p);
+          ctx.beginPath();
+          ctx.moveTo(centerX - 15, ly);
+          ctx.lineTo(centerX + 15, ly);
+          ctx.stroke();
+        }
       }
     }
 
-		if (nota.paso >= 5) {
-		  for (let p = 6; p <= nota.paso; p += 2) {
-			const ly = yDesdePaso(p);
-			ctx.beginPath();
-			ctx.moveTo(centerX - 15, ly);
-			ctx.lineTo(centerX + 15, ly);
-			ctx.stroke();
-		  }
-		}
-    }
+
+
 
     function nuevaNota() {
       dibujarPentagrama();
-      notaActual = notas[Math.floor(Math.random() * notas.length)];
+
+      let nueva;
+      do {
+        nueva = Math.floor(Math.random() * notas.length);
+      } while (nueva === notaAnterior);
+
+      notaAnterior = nueva;
+      notaActual = notas[nueva];
       dibujarNota(notaActual);
     }
 
@@ -140,4 +157,5 @@
     nuevaNota();
   </script>
 </body>
+
 </html>
