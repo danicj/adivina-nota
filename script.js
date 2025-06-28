@@ -24,6 +24,20 @@ const notas = [
 let notaActual;
 let notaAnterior = null;
 
+let aciertos = 0;
+let errores = 0;
+
+const registroErrores = {
+  Do: 0,
+  Re: 0,
+  Mi: 0,
+  Fa: 0,
+  Sol: 0,
+  La: 0,
+  Si: 0
+};
+
+
 function dibujarPentagrama() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.lineWidth = 2;
@@ -73,29 +87,63 @@ function dibujarNota(nota) {
 
 
 function nuevaNota() {
-  dibujarPentagrama();
-
-  let nueva;
-  do {
-    nueva = Math.floor(Math.random() * notas.length);
-  } while (nueva === notaAnterior);
-
-  notaAnterior = nueva;
-  notaActual = notas[nueva];
-  dibujarNota(notaActual);
-}
+    dibujarPentagrama();
+  
+    let nueva;
+    do {
+      nueva = Math.floor(Math.random() * notas.length);
+    } while (nueva === notaAnterior);
+  
+    notaAnterior = nueva;
+    notaActual = notas[nueva];
+    dibujarNota(notaActual);
+  
+    actualizarMarcadores();
+    actualizarRankingErrores();
+  }
+  
 
 function verificar(respuesta) {
-  const resultado = document.getElementById("resultado");
-  if (respuesta === notaActual.nombre) {
-    resultado.textContent = "¡Correcto!";
-    setTimeout(() => {
-      resultado.textContent = "";
-      nuevaNota();
-    }, 250);
-  } else {
-    resultado.textContent = "Incorrecto, intenta de nuevo.";
+    const resultado = document.getElementById("resultado");
+    if (respuesta === notaActual.nombre) {
+      resultado.textContent = "¡Correcto!";
+      aciertos++;
+      actualizarMarcadores();
+      setTimeout(() => {
+        resultado.textContent = "";
+        nuevaNota();
+      }, 300);
+    } else {
+      resultado.textContent = "Incorrecto, intenta de nuevo.";
+      errores++;
+      registroErrores[notaActual.nombre]++;
+      actualizarMarcadores();
+      actualizarRankingErrores();
+    }
   }
-}
+  
 
 nuevaNota();
+
+
+function actualizarMarcadores() {
+    document.getElementById("contadorAciertos").textContent = aciertos;
+    document.getElementById("contadorErrores").textContent = errores;
+  }
+
+
+  function actualizarRankingErrores() {
+    const lista = document.getElementById("listaErrores");
+    lista.innerHTML = "";
+  
+    const ordenado = Object.entries(registroErrores)
+      .filter(([_, valor]) => valor > 0)
+      .sort((a, b) => b[1] - a[1]);
+  
+    ordenado.forEach(([nota, veces]) => {
+      const li = document.createElement("li");
+      li.textContent = `${nota}: ${veces} errores`;
+      lista.appendChild(li);
+    });
+  }
+  
