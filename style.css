@@ -20,9 +20,9 @@ body {
   }
 
   button {
-    padding: 15px 20px;
-    margin: 8px;
-    font-size: 22px;
+    padding: 10px 12px;
+    margin: 3px 2px;
+    font-size: 18px;
     min-width: 80px;
     border-radius: 8px;
   }
