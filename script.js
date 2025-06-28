@@ -112,7 +112,7 @@ function verificar(respuesta) {
     setTimeout(() => {
       boton.classList.remove("correcto");
       nuevaNota();
-    }, 500);
+    }, 300);
   } else {
     boton.classList.add("incorrecto");
     errores++;
@@ -122,7 +122,7 @@ function verificar(respuesta) {
 
     setTimeout(() => {
       boton.classList.remove("incorrecto");
-    }, 500);
+    }, 300);
   }
 }
 
