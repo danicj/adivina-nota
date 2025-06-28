@@ -49,3 +49,13 @@ body {
     padding: 0;
   }
   
+  button.correcto {
+    background-color: #4CAF50 !important; /* Verde */
+    color: white;
+  }
+  
+  button.incorrecto {
+    background-color: #f44336 !important; /* Rojo */
+    color: white;
+  }
+  

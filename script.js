@@ -34,9 +34,8 @@ const registroErrores = {
   Fa: 0,
   Sol: 0,
   La: 0,
-  Si: 0
+  Si: 0,
 };
-
 
 function dibujarPentagrama() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -85,65 +84,66 @@ function dibujarNota(nota) {
   }
 }
 
-
 function nuevaNota() {
-    dibujarPentagrama();
-  
-    let nueva;
-    do {
-      nueva = Math.floor(Math.random() * notas.length);
-    } while (nueva === notaAnterior);
-  
-    notaAnterior = nueva;
-    notaActual = notas[nueva];
-    dibujarNota(notaActual);
-  
-    actualizarMarcadores();
-    actualizarRankingErrores();
-  }
-  
+  dibujarPentagrama();
+
+  let nueva;
+  do {
+    nueva = Math.floor(Math.random() * notas.length);
+  } while (nueva === notaAnterior);
+
+  notaAnterior = nueva;
+  notaActual = notas[nueva];
+  dibujarNota(notaActual);
+
+  actualizarMarcadores();
+  actualizarRankingErrores();
+}
 
 function verificar(respuesta) {
-    const resultado = document.getElementById("resultado");
-    if (respuesta === notaActual.nombre) {
-      resultado.textContent = "¡Correcto!";
-      aciertos++;
-      actualizarMarcadores();
-      setTimeout(() => {
-        resultado.textContent = "";
-        nuevaNota();
-      }, 300);
-    } else {
-      resultado.textContent = "Incorrecto, intenta de nuevo.";
-      errores++;
-      registroErrores[notaActual.nombre]++;
-      actualizarMarcadores();
-      actualizarRankingErrores();
-    }
+  const botones = document.querySelectorAll("button");
+  const boton = [...botones].find((b) => b.textContent === respuesta);
+
+  if (respuesta === notaActual.nombre) {
+    boton.classList.add("correcto");
+    aciertos++;
+    actualizarMarcadores();
+
+    setTimeout(() => {
+      boton.classList.remove("correcto");
+      nuevaNota();
+    }, 500);
+  } else {
+    boton.classList.add("incorrecto");
+    errores++;
+    registroErrores[notaActual.nombre]++;
+    actualizarMarcadores();
+    actualizarRankingErrores();
+
+    setTimeout(() => {
+      boton.classList.remove("incorrecto");
+    }, 500);
   }
-  
+}
 
 nuevaNota();
 
-
 function actualizarMarcadores() {
-    document.getElementById("contadorAciertos").textContent = aciertos;
-    document.getElementById("contadorErrores").textContent = errores;
-  }
+  document.getElementById("contadorAciertos").textContent = aciertos;
+  document.getElementById("contadorErrores").textContent = errores;
+}
 
+function actualizarRankingErrores() {
+  const lista = document.getElementById("listaErrores");
+  lista.innerHTML = "";
 
-  function actualizarRankingErrores() {
-    const lista = document.getElementById("listaErrores");
-    lista.innerHTML = "";
-  
-    const ordenado = Object.entries(registroErrores)
-      .filter(([_, valor]) => valor > 0)
-      .sort((a, b) => b[1] - a[1]);
-  
-    ordenado.forEach(([nota, veces]) => {
-      const li = document.createElement("li");
-      li.textContent = `${nota}: ${veces} errores`;
-      lista.appendChild(li);
-    });
-  }
-  
+  const ordenado = Object.entries(registroErrores)
+    .filter(([_, valor]) => valor > 0)
+    .sort((a, b) => b[1] - a[1]);
+
+  ordenado.forEach(([nota, veces]) => {
+    const li = document.createElement("li");
+    li.textContent = `${nota}: ${veces} errores`;
+    lista.appendChild(li);
+  });
+}
