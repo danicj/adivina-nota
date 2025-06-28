@@ -96,16 +96,16 @@
       ctx.fillStyle = "black";
       ctx.fill();
 
-      // Dibujar líneas adicionales si es necesario
-		if (nota.paso <= -5) {
-		  for (let p = -6; p <= nota.paso; p += 2) {
-			const ly = yDesdePaso(p);
-			ctx.beginPath();
-			ctx.moveTo(centerX - 15, ly);
-			ctx.lineTo(centerX + 15, ly);
-			ctx.stroke();
-		  }
-		}
+    // Dibujar líneas adicionales si es necesario
+    if (nota.paso <= -6) {
+      for (let p = -6; p <= nota.paso; p += 2) {
+        const ly = yDesdePaso(p);
+        ctx.beginPath();
+        ctx.moveTo(centerX - 15, ly);
+        ctx.lineTo(centerX + 15, ly);
+        ctx.stroke();
+      }
+    }
 
 		if (nota.paso >= 5) {
 		  for (let p = 6; p <= nota.paso; p += 2) {
