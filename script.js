@@ -5,6 +5,8 @@ const centerX = 300;
 const lineSpacing = 24; // ← Espaciado más cómodo
 const middleLineY = 240; // ← Ajustado para el nuevo espaciado
 
+const esMovil = /Mobi|Android/i.test(navigator.userAgent);
+
 const notas = [
   { nombre: "Do", paso: -6 },
   { nombre: "Re", paso: -5 },
@@ -102,7 +104,7 @@ function nuevaNota() {
   const entradaNota = document.getElementById("entradaNota");
 
   // Enfocar automáticamente
-  entradaNota.focus();
+  enfocar();
 
   // Validar al pulsar la barra espaciadora
   const notasValidas = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
@@ -123,7 +125,7 @@ function nuevaNota() {
     }
   });
 
-  entradaNota.focus();
+  enfocar();
 }
 
 function verificar(respuesta) {
@@ -151,7 +153,7 @@ function verificar(respuesta) {
     }, 300);
   }
 
-  entradaNota.focus();
+  enfocar();
 }
 
 nuevaNota();
@@ -178,10 +180,16 @@ function actualizarRankingErrores() {
 
 // Enfocar el input si se hace clic en cualquier parte del documento
 document.addEventListener("click", () => {
-  entradaNota.focus();
+  enfocar();
 });
 
 // Enfocar el input al volver a la pestaña
 window.addEventListener("focus", () => {
-  entradaNota.focus();
+  enfocar();
 });
+
+function enfocar() {
+  if (!esMovil) {
+    entradaNota.focus();
+  }
+}
