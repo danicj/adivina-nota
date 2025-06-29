@@ -175,3 +175,13 @@ function actualizarRankingErrores() {
     lista.appendChild(li);
   });
 }
+
+// Enfocar el input si se hace clic en cualquier parte del documento
+document.addEventListener("click", () => {
+  entradaNota.focus();
+});
+
+// Enfocar el input al volver a la pestaña
+window.addEventListener("focus", () => {
+  entradaNota.focus();
+});
