@@ -5,7 +5,7 @@ const centerX = 300;
 const lineSpacing = 24; // ← Espaciado más cómodo
 const middleLineY = 240; // ← Ajustado para el nuevo espaciado
 
-const esMovil = /Mobi|Android/i.test(navigator.userAgent);
+const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 const notas = [
   { nombre: "Do", paso: -6 },
