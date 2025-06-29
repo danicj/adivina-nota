@@ -98,6 +98,32 @@ function nuevaNota() {
 
   actualizarMarcadores();
   actualizarRankingErrores();
+
+  const entradaNota = document.getElementById("entradaNota");
+
+  // Enfocar automáticamente
+  entradaNota.focus();
+
+  // Validar al pulsar la barra espaciadora
+  const notasValidas = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
+
+  entradaNota.addEventListener("keydown", function (e) {
+    if (e.code === "Space" || e.code === "Enter") {
+      e.preventDefault(); // Evita que se añada un espacio
+      const texto = entradaNota.value.trim().toLowerCase();
+      const entradaCapitalizada =
+        texto.charAt(0).toUpperCase() + texto.slice(1);
+
+      if (notasValidas.includes(entradaCapitalizada)) {
+        verificar(entradaCapitalizada);
+      }
+
+      // Limpiar el campo SIEMPRE
+      entradaNota.value = "";
+    }
+  });
+
+  entradaNota.focus();
 }
 
 function verificar(respuesta) {
@@ -124,6 +150,8 @@ function verificar(respuesta) {
       boton.classList.remove("incorrecto");
     }, 300);
   }
+
+  entradaNota.focus();
 }
 
 nuevaNota();
