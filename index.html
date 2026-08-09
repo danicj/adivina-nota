@@ -8,8 +8,14 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body data-theme="light">
   <h1>¿Qué nota es esta?</h1>
+
+  <div id="controles">
+    <button id="btnSonido" onclick="toggleSonido()" title="Activar/desactivar sonido">🔊</button>
+    <button id="btnTema" onclick="toggleTema()" title="Cambiar tema">🌙</button>
+  </div>
+
   <canvas id="pentagrama" width="600" height="480"></canvas>
 
   <div class="botones">
@@ -32,22 +38,24 @@
 
   <div id="marcadores">
     ✅ Aciertos: <span id="contadorAciertos">0</span> |
-    ❌ Errores: <span id="contadorErrores">0</span>
+    ❌ Errores: <span id="contadorErrores">0</span> |
+    ⚡ Racha: <span id="contadorRacha">0</span> |
+    🏆 Mejor racha: <span id="contadorMejorRacha">0</span>
   </div>
+
+  <button id="btnReiniciar" onclick="reiniciarMarcadores()">Reiniciar marcadores</button>
 
   <div id="rankingErrores">
     <h3>Notas más falladas:</h3>
     <ul id="listaErrores"></ul>
   </div>
 
-
-
-
-
-
+  <div id="progreso">
+    <h3>Progreso</h3>
+    <div id="barrasProgreso"></div>
+  </div>
 
   <script src="script.js"></script>
-
 </body>
 
 </html>
