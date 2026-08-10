@@ -9,14 +9,19 @@
 </head>
 
 <body data-theme="light">
-  <h1>¿Qué nota es esta?</h1>
+  <header class="cabecera">
+    <h1>¿Qué nota es esta?</h1>
+    <div class="acciones">
+      <button id="btnSonido" onclick="toggleSonido()" title="Activar/desactivar sonido">🔊</button>
+      <button id="btnTema" onclick="toggleTema()" title="Cambiar tema">🌙</button>
+      <button id="btnCrono" onclick="toggleCronometro()" title="Modo contrarreloj">⏱️</button>
+    </div>
+  </header>
 
-  <div id="controles">
-    <button id="btnSonido" onclick="toggleSonido()" title="Activar/desactivar sonido">🔊</button>
-    <button id="btnTema" onclick="toggleTema()" title="Cambiar tema">🌙</button>
+  <div class="pentagrama-contenedor">
+    <canvas id="pentagrama" width="360" height="280"></canvas>
+    <span id="cronoMini" class="crono-mini oculto">0:00.0</span>
   </div>
-
-  <canvas id="pentagrama" width="600" height="480"></canvas>
 
   <div class="botones">
     <button onclick="verificar('Do')">Do</button>
@@ -36,6 +41,17 @@
 
   <div id="resultado"></div>
 
+  <div id="panelCrono" class="oculto">
+    <h3>⏱️ Contrarreloj</h3>
+    <p id="explicacionCrono" class="explicacion">Completa 10 notas correctas en el menor tiempo posible. Cada fallo suma +5s. El cronómetro arranca con tu primera nota.</p>
+    <div id="cronoDisplay">0:00.0</div>
+    <div id="cronoProgreso">0/10 correctas</div>
+    <div id="cronoResultado"></div>
+    <button id="btnCronoNueva" class="oculto" onclick="prepararNuevaRonda()">🔄 Nueva ronda</button>
+    <button id="btnCompartirCrono" class="oculto" onclick="compartirContrarreloj()">📤 Compartir contrarreloj</button>
+    <div id="rankingTiempos"></div>
+  </div>
+
   <div id="marcadores">
     ✅ Aciertos: <span id="contadorAciertos">0</span> |
     ❌ Errores: <span id="contadorErrores">0</span> |
@@ -44,15 +60,19 @@
   </div>
 
   <button id="btnReiniciar" onclick="reiniciarMarcadores()">Reiniciar marcadores</button>
-
-  <div id="rankingErrores">
-    <h3>Notas más falladas:</h3>
-    <ul id="listaErrores"></ul>
+  <div class="acciones-compartir">
+    <button id="btnCompartir" class="oculto" onclick="compartirResultados()">📤 Compartir resultados</button>
   </div>
 
   <div id="progreso">
     <h3>Progreso</h3>
+    <p class="explicacion">Cada punto de la gráfica es un bloque de 10 respuestas; el porcentaje indica los aciertos de ese bloque.</p>
     <div id="barrasProgreso"></div>
+  </div>
+
+  <div id="rankingErrores">
+    <h3>Las notas que más se te resisten</h3>
+    <ul id="listaErrores"></ul>
   </div>
 
   <script src="script.js"></script>

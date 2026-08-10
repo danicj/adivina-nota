@@ -26,7 +26,7 @@
 body {
   font-family: sans-serif;
   text-align: center;
-  padding: 20px;
+  padding: 0 20px 20px;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -36,25 +36,96 @@ body {
   transition: background-color 0.2s, color 0.2s;
 }
 
-#controles {
+.cabecera {
+  width: 100%;
+  max-width: 1000px;
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 0 -16px 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--borde-canvas);
 }
 
-#controles button {
-  font-size: 20px;
-  min-width: 44px;
-  padding: 8px 12px;
+.cabecera h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.acciones {
+  display: flex;
+  gap: 4px;
+}
+
+.acciones button {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  min-width: 36px;
+  padding: 6px 8px;
+  margin: 0;
   cursor: pointer;
+  border-radius: 6px;
+  opacity: 0.7;
+}
+
+.acciones button:hover {
+  opacity: 1;
+  background-color: var(--boton-bg);
+}
+
+.acciones button.activo {
+  opacity: 1;
+  background-color: var(--boton-bg);
+  box-shadow: inset 0 0 0 2px var(--texto);
+}
+
+.oculto {
+  display: none;
+}
+
+.explicacion {
+  font-size: 14px;
+  opacity: 0.75;
+  max-width: 420px;
+  margin: 0 auto 10px;
+}
+
+@media (max-width: 480px) {
+  .cabecera h1 {
+    font-size: 17px;
+  }
+
+  .acciones button {
+    font-size: 16px;
+  }
+}
+
+.pentagrama-contenedor {
+  position: relative;
+  margin-bottom: 20px;
 }
 
 canvas {
   border: 1px solid var(--borde-canvas);
-  margin-bottom: 20px;
   background-color: var(--canvas-bg);
   max-width: 100%;
   height: auto;
+}
+
+.crono-mini {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 9px;
+  border-radius: 999px;
+  z-index: 2;
 }
 
 .botones {
@@ -97,24 +168,199 @@ button {
   margin-top: 12px;
 }
 
+.acciones-compartir {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#btnCompartir {
+  background-color: #2196f3;
+  color: white;
+}
+
+#btnCompartirCrono {
+  margin-top: 10px;
+  background-color: #2196f3;
+  color: white;
+}
+
+#btnCronoNueva {
+  margin-top: 10px;
+}
+
+#panelCrono {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--borde-canvas);
+  border-radius: 12px;
+  background-color: var(--canvas-bg);
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+}
+
+#cronoDisplay {
+  font-size: 44px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  margin: 6px 0 2px;
+}
+
+#cronoProgreso {
+  font-size: 16px;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+#cronoResultado {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff9800;
+}
+
+.ranking-lista {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  text-align: left;
+}
+
+.fila-tiempo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--borde-canvas);
+}
+
+.fila-tiempo .medalla {
+  width: 28px;
+  text-align: center;
+}
+
+.fila-tiempo .tiempo {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  flex: 1;
+}
+
 #rankingErrores {
   margin-top: 20px;
   font-size: 18px;
+  padding: 16px;
+  border: 1px solid var(--borde-canvas);
+  border-radius: 12px;
+  background-color: var(--canvas-bg);
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+}
+
+#rankingErrores h3 {
+  margin-top: 0;
 }
 
 #rankingErrores ul {
   list-style: none;
   padding: 0;
+  margin: 0;
+}
+
+.fila-nota {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  background-color: var(--boton-bg);
+}
+
+.fila-nota .medalla {
+  width: 28px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.pildora-nota {
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background-color: var(--texto);
+  color: var(--fondo);
+}
+
+.pildora-nota.top {
+  background-color: #ff9800;
+  color: #ffffff;
+}
+
+.fila-nota .fuego {
+  font-size: 20px;
+  animation: pop 0.6s ease;
+}
+
+.fila-nota .contador {
+  margin-left: auto;
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+.vacio {
+  opacity: 0.75;
+  font-size: 16px;
+  margin: 8px 0;
 }
 
 button.correcto {
   background-color: #4CAF50 !important; /* Verde */
   color: white;
+  animation: pop 0.3s ease;
 }
 
 button.incorrecto {
   background-color: #f44336 !important; /* Rojo */
   color: white;
+}
+
+canvas.agitar {
+  animation: agitar 0.3s ease;
+}
+
+@keyframes agitar {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.confeti {
+  position: fixed;
+  top: -12px;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1000;
+  animation-name: caida;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes caida {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0.8;
+  }
 }
 
 #progreso {
@@ -128,20 +374,36 @@ button.incorrecto {
   text-align: left;
 }
 
-#barrasProgreso .etiqueta {
-  font-size: 13px;
-  margin: 10px 0 2px;
+.grafica-evolucion {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
 }
 
-.barra-progreso {
-  background-color: var(--barra-fondo);
-  border-radius: 4px;
-  height: 16px;
-  overflow: hidden;
+.grafica-linea {
+  fill: none;
+  stroke: #4CAF50;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
-.barra-progreso .relleno {
-  height: 100%;
-  background-color: #4CAF50;
-  border-radius: 4px;
+.grafica-punto {
+  fill: #4CAF50;
+  stroke: var(--canvas-bg);
+  stroke-width: 1.5;
+}
+
+.grafica-texto {
+  font-size: 12px;
+  font-family: sans-serif;
+  fill: var(--texto);
+  font-weight: bold;
+}
+
+.grafica-fecha {
+  font-size: 10px;
+  font-family: sans-serif;
+  fill: var(--texto);
+  opacity: 0.7;
 }
