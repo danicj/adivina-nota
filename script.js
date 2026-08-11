@@ -11,13 +11,34 @@ const radioNota = 15;
 const extensionLinea = 24;
 
 // ▶ AJUSTE VISUAL DEL GLIFO DE CLAVE (por clave)
-// tam = tamaño del símbolo (px). x = posición horizontal del centro.
+// tam = altura FINAL del símbolo en píxeles (se normaliza en todos los
+//       dispositivos). x = posición horizontal del centro.
 // y   = posición vertical del centro (mayor = más abajo).
 // Ajusta a ojo y recarga. Valores calibrados para el pentagrama actual.
 const glifo = {
   sol: { tam: 150, x: staffInicio + 6, y: middleLineY + 10 },
-  fa: { tam: 120, x: staffInicio + 6, y: middleLineY - 10 },
+  fa: { tam: 80, x: staffInicio + 6, y: middleLineY - 10 },
 };
+
+// Dibuja el glifo con altura fija `tam` (normaliza las métricas de fuente,
+// que varían entre dispositivos: en Android la 𝄞/𝄢 se renderiza más grande).
+function dibujarGlifo(clave) {
+  const cfg = glifo[clave] || glifo.sol;
+  const glyph = clave === "fa" ? "𝄢" : "𝄞";
+  const base = 150; // fuente base para medir (independiente de tam)
+  ctx.font = `${base}px "Noto Music", "Segoe UI Symbol", serif`;
+  const m = ctx.measureText(glyph);
+  const alto = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+  const escala = alto > 0 ? cfg.tam / alto : 1;
+  ctx.save();
+  ctx.translate(cfg.x, cfg.y);
+  ctx.scale(escala, escala);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = cssVar("--linea");
+  ctx.fillText(glyph, 0, 0);
+  ctx.restore();
+}
 
 const esMovil =
   window.matchMedia("(pointer: coarse)").matches ||
@@ -334,12 +355,7 @@ function dibujarPentagrama() {
   }
 
   // Glifo de clave (Sol o Fa) — tamaño/posición en el objeto `glifo` (arriba)
-  const g = glifo[claveActual] || glifo.sol;
-  ctx.font = `${g.tam}px serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = cssVar("--linea");
-  ctx.fillText(claveActual === "fa" ? "𝄢" : "𝄞", g.x, g.y);
+  dibujarGlifo(claveActual);
 }
 
 function yDesdePaso(paso) {
