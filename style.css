@@ -92,6 +92,36 @@ body {
   margin: 0 auto 10px;
 }
 
+.configuracion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+}
+
+.configuracion label {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.configuracion select {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--borde-canvas);
+  background-color: var(--boton-bg);
+  color: var(--boton-texto);
+}
+
+#btnReproducir {
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 14px;
+  min-width: 0;
+}
+
 @media (max-width: 480px) {
   .cabecera h1 {
     font-size: 17px;
@@ -304,6 +334,12 @@ button {
   animation: pop 0.6s ease;
 }
 
+.glifo-clave {
+  font-size: 20px;
+  line-height: 1;
+  opacity: 0.9;
+}
+
 .fila-nota .contador {
   margin-left: auto;
   font-size: 15px;
@@ -406,4 +442,16 @@ canvas.agitar {
   font-family: sans-serif;
   fill: var(--texto);
   opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confeti {
+    display: none;
+  }
+
+  canvas.agitar,
+  button.correcto,
+  .fila-nota .fuego {
+    animation: none;
+  }
 }

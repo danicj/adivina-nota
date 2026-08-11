@@ -10,25 +10,54 @@ const staffFin = 320;
 const radioNota = 15;
 const extensionLinea = 24;
 
-const esMovil = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+// ▶ AJUSTE VISUAL DEL GLIFO DE CLAVE (por clave)
+// tam = tamaño del símbolo (px). x = posición horizontal del centro.
+// y   = posición vertical del centro (mayor = más abajo).
+// Ajusta a ojo y recarga. Valores calibrados para el pentagrama actual.
+const glifo = {
+  sol: { tam: 150, x: staffInicio + 6, y: middleLineY + 10 },
+  fa: { tam: 120, x: staffInicio + 6, y: middleLineY - 10 },
+};
 
-const notas = [
-  { nombre: "Do", paso: -6 },
-  { nombre: "Re", paso: -5 },
-  { nombre: "Mi", paso: -4 },
-  { nombre: "Fa", paso: -3 },
-  { nombre: "Sol", paso: -2 },
-  { nombre: "La", paso: -1 },
-  { nombre: "Si", paso: 0 },
-  { nombre: "Do", paso: 1 },
-  { nombre: "Re", paso: 2 },
-  { nombre: "Mi", paso: 3 },
-  { nombre: "Fa", paso: 4 },
-  { nombre: "Sol", paso: 5 },
-  { nombre: "La", paso: 6 },
+const esMovil =
+  window.matchMedia("(pointer: coarse)").matches ||
+  /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const NOTAS_SOL = [
+  { nombre: "Do", paso: -6 }, // Do4
+  { nombre: "Re", paso: -5 }, // Re4
+  { nombre: "Mi", paso: -4 }, // Mi4
+  { nombre: "Fa", paso: -3 }, // Fa4
+  { nombre: "Sol", paso: -2 }, // Sol4
+  { nombre: "La", paso: -1 }, // La4
+  { nombre: "Si", paso: 0 }, // Si4
+  { nombre: "Do", paso: 1 }, // Do5
+  { nombre: "Re", paso: 2 }, // Re5
+  { nombre: "Mi", paso: 3 }, // Mi5
+  { nombre: "Fa", paso: 4 }, // Fa5
+  { nombre: "Sol", paso: 5 }, // Sol5
+  { nombre: "La", paso: 6 }, // La5
 ];
 
-const FRECUENCIAS = {
+const NOTAS_FA = [
+  { nombre: "Mi", paso: -6 }, // Mi2 (E2)
+  { nombre: "Fa", paso: -5 }, // Fa2 (F2)
+  { nombre: "Sol", paso: -4 }, // Sol2 (G2)
+  { nombre: "La", paso: -3 }, // La2 (A2)
+  { nombre: "Si", paso: -2 }, // Si2 (B2)
+  { nombre: "Do", paso: -1 }, // Do3 (C3)
+  { nombre: "Re", paso: 0 }, // Re3 (D3), línea central
+  { nombre: "Mi", paso: 1 }, // Mi3 (E3)
+  { nombre: "Fa", paso: 2 }, // Fa3 (F3)
+  { nombre: "Sol", paso: 3 }, // Sol3 (G3)
+  { nombre: "La", paso: 4 }, // La3 (A3)
+  { nombre: "Si", paso: 5 }, // Si3 (B3)
+  { nombre: "Do", paso: 6 }, // Do4 (C4)
+];
+
+const FRECUENCIAS_SOL = {
   "-6": 261.63, // Do4
   "-5": 293.66, // Re4
   "-4": 329.63, // Mi4
@@ -44,6 +73,23 @@ const FRECUENCIAS = {
   "6": 880.0, // La5
 };
 
+// Frecuencias en clave de Fa (rango E2..C4, mismo índice de pasos que Sol)
+const FRECUENCIAS_FA = {
+  "-6": 82.41, // Mi2
+  "-5": 87.31, // Fa2
+  "-4": 98.0, // Sol2
+  "-3": 110.0, // La2
+  "-2": 123.47, // Si2
+  "-1": 130.81, // Do3
+  "0": 146.83, // Re3
+  "1": 164.81, // Mi3
+  "2": 174.61, // Fa3
+  "3": 196.0, // Sol3
+  "4": 220.0, // La3
+  "5": 246.94, // Si3
+  "6": 261.63, // Do4
+};
+
 const CLAVE_STATS = "adivinaNotaStats";
 const CLAVE_PREFS = "adivinaNotaPrefs";
 const CLAVE_RANKING = "adivinaNotaRanking";
@@ -55,14 +101,38 @@ const MAX_RANKING = 5;
 
 const registroErrores = {};
 
-function etiquetaNota(nota) {
-  const duplicada = notas.filter((n) => n.nombre === nota.nombre).length > 1;
+function etiquetaNota(nota, clave = claveActual) {
+  const base = clave === "fa" ? NOTAS_FA : NOTAS_SOL;
+  const duplicada = base.filter((n) => n.nombre === nota.nombre).length > 1;
   if (!duplicada) return nota.nombre;
   return nota.paso <= 0 ? `${nota.nombre} grave` : `${nota.nombre} agudo`;
 }
 
+function claveDeError(clavePaso) {
+  return clavePaso.includes(":") ? clavePaso.split(":")[0] : "sol";
+}
+
+function notaDeError(clavePaso) {
+  const [clave, paso] = clavePaso.includes(":")
+    ? clavePaso.split(":")
+    : ["sol", clavePaso];
+  const base = clave === "fa" ? NOTAS_FA : NOTAS_SOL;
+  return base.find((n) => String(n.paso) === paso);
+}
+
+function esClavePasoValido(clavePaso) {
+  const clave = claveDeError(clavePaso);
+  const paso = clavePaso.includes(":") ? clavePaso.split(":")[1] : clavePaso;
+  const base = clave === "fa" ? NOTAS_FA : NOTAS_SOL;
+  return base.some((n) => String(n.paso) === paso);
+}
+
 let notaActual;
 let notaAnterior = null;
+
+let claveActual = "sol";
+let notas = obtenerNotas();
+let erroresConsecutivos = 0;
 
 let aciertos = 0;
 let errores = 0;
@@ -81,6 +151,15 @@ let cronoCorrectas = 0;
 let cronoTiempoFinal = 0;
 let cronoIntervalo = null;
 let ultimaPartidaCrono = null;
+
+function obtenerNotas() {
+  return claveActual === "fa" ? NOTAS_FA : NOTAS_SOL;
+}
+
+function frecuenciaDePaso(paso) {
+  const tabla = claveActual === "fa" ? FRECUENCIAS_FA : FRECUENCIAS_SOL;
+  return tabla[String(paso)];
+}
 
 // ---------- Tema ----------
 
@@ -139,17 +218,17 @@ function tocarTono(frecuencia, duracion, tipo = "sine", volumen = 0.2) {
 
 function sonidoAcierto() {
   if (!notaActual) return;
-  tocarTono(FRECUENCIAS[notaActual.paso], 0.7, "sine", 0.3);
+  tocarTono(frecuenciaDePaso(notaActual.paso), 0.7, "sine", 0.3);
 }
 
 function sonidoError() {
   if (!notaActual) return;
-  tocarTono(FRECUENCIAS[notaActual.paso], 0.4, "square", 0.1);
+  tocarTono(frecuenciaDePaso(notaActual.paso), 0.4, "square", 0.1);
 }
 
 function reproducirNota() {
   if (!notaActual) return;
-  tocarTono(FRECUENCIAS[notaActual.paso], 0.7, "sine", 0.25);
+  tocarTono(frecuenciaDePaso(notaActual.paso), 0.7, "sine", 0.25);
 }
 
 function actualizarBotonSonido() {
@@ -171,7 +250,12 @@ function toggleSonido() {
 function guardarPrefs() {
   localStorage.setItem(
     CLAVE_PREFS,
-    JSON.stringify({ sonido: sonidoActivado, tema: temaOscuro, crono: modoCronometro })
+    JSON.stringify({
+      sonido: sonidoActivado,
+      tema: temaOscuro,
+      crono: modoCronometro,
+      clave: claveActual,
+    })
   );
 }
 
@@ -200,7 +284,8 @@ function cargarEstado() {
       mejorRacha = s.mejorRacha || 0;
       if (s.registroErrores) {
         Object.entries(s.registroErrores).forEach(([k, v]) => {
-          if (notas.some((n) => String(n.paso) === k)) registroErrores[k] = v;
+          const clavePaso = k.includes(":") ? k : `sol:${k}`;
+          if (esClavePasoValido(clavePaso)) registroErrores[clavePaso] = v;
         });
       }
       historial = Array.isArray(s.historial) ? s.historial : [];
@@ -214,13 +299,24 @@ function cargarEstado() {
       sonidoActivado = p.sonido !== false;
       temaOscuro = !!p.tema;
       modoCronometro = !!p.crono;
+      claveActual = p.clave === "fa" ? "fa" : "sol";
     }
   } catch (e) {}
+
+  notas = obtenerNotas();
 
   try {
     const r = JSON.parse(localStorage.getItem(CLAVE_RANKING));
     if (Array.isArray(r)) rankingTiempos = r;
   } catch (e) {}
+}
+
+function cambiarClave() {
+  claveActual = document.getElementById("selectorClave").value;
+  notas = obtenerNotas();
+  guardarPrefs();
+  redibujar();
+  nuevaNota();
 }
 
 // ---------- Dibujo ----------
@@ -236,6 +332,14 @@ function dibujarPentagrama() {
     ctx.lineTo(staffFin, y);
     ctx.stroke();
   }
+
+  // Glifo de clave (Sol o Fa) — tamaño/posición en el objeto `glifo` (arriba)
+  const g = glifo[claveActual] || glifo.sol;
+  ctx.font = `${g.tam}px serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = cssVar("--linea");
+  ctx.fillText(claveActual === "fa" ? "𝄢" : "𝄞", g.x, g.y);
 }
 
 function yDesdePaso(paso) {
@@ -281,6 +385,7 @@ function redibujar() {
 // ---------- Animaciones ----------
 
 function spawnConfetti() {
+  if (reduceMotion) return;
   const colores = [
     "#f44336",
     "#e91e63",
@@ -319,7 +424,12 @@ function nuevaNota() {
 
   notaAnterior = nueva;
   notaActual = notas[nueva];
+  erroresConsecutivos = 0;
   dibujarNota(notaActual);
+  canvas.setAttribute(
+    "aria-label",
+    `Pentagrama con la nota ${etiquetaNota(notaActual)}`
+  );
 
   const resultado = document.getElementById("resultado");
   resultado.textContent = "";
@@ -330,9 +440,20 @@ function nuevaNota() {
   enfocar();
 }
 
+function pistaDireccional(respuesta) {
+  const candidatas = notas.filter((n) => n.nombre === respuesta);
+  if (candidatas.length === 0) return null;
+  const masCercana = candidatas.reduce((mejor, n) =>
+    Math.abs(n.paso - notaActual.paso) < Math.abs(mejor.paso - notaActual.paso)
+      ? n
+      : mejor
+  );
+  if (masCercana.paso === notaActual.paso) return null;
+  return masCercana.paso < notaActual.paso ? "aguda" : "grave";
+}
+
 function verificar(respuesta) {
-  const botones = document.querySelectorAll("button");
-  const boton = [...botones].find((b) => b.textContent === respuesta);
+  const boton = document.querySelector(`button[data-nota="${respuesta}"]`);
   const resultado = document.getElementById("resultado");
 
   if (modoCronometro && cronoTiempoFinal === 0 && !cronometroActivo) {
@@ -365,16 +486,26 @@ function verificar(respuesta) {
     boton.classList.add("incorrecto");
     errores++;
     racha = 0;
-    registroErrores[notaActual.paso] =
-      (registroErrores[notaActual.paso] || 0) + 1;
+    erroresConsecutivos++;
+    const kError = `${claveActual}:${notaActual.paso}`;
+    registroErrores[kError] = (registroErrores[kError] || 0) + 1;
     if (cronometroActivo) cronoPenalizacion += PENALIZACION_CRONO_MS;
     sonidoError();
-    canvas.classList.remove("agitar");
-    void canvas.offsetWidth;
-    canvas.classList.add("agitar");
+    if (!reduceMotion) {
+      canvas.classList.remove("agitar");
+      void canvas.offsetWidth;
+      canvas.classList.add("agitar");
+    }
     dibujarPentagrama();
     dibujarNota(notaActual, cssVar("--feedback-error"));
-    resultado.textContent = `Era un ${etiquetaNota(notaActual)}`;
+    if (erroresConsecutivos >= 3) {
+      resultado.textContent = `Era un ${etiquetaNota(notaActual)}`;
+    } else {
+      const pista = pistaDireccional(respuesta);
+      resultado.textContent = pista
+        ? `Incorrecto. La nota es más ${pista}. Inténtalo de nuevo`
+        : "Incorrecto. Inténtalo de nuevo";
+    }
     resultado.className = "resultado-error";
     actualizarMarcadores();
     actualizarRankingErrores();
@@ -839,10 +970,11 @@ function actualizarRankingErrores() {
     return;
   }
 
-  ordenado.forEach(([paso, veces], indice) => {
-    const nota = notas.find((n) => String(n.paso) === paso);
+  ordenado.forEach(([clavePaso, veces], indice) => {
+    const clave = claveDeError(clavePaso);
+    const nota = notaDeError(clavePaso);
     if (!nota) return;
-    const etiqueta = etiquetaNota(nota);
+    const etiqueta = etiquetaNota(nota, clave);
 
     const li = document.createElement("li");
     li.className = "fila-nota";
@@ -856,12 +988,18 @@ function actualizarRankingErrores() {
     if (indice === 0) pildora.classList.add("top");
     pildora.textContent = etiqueta;
 
+    const glifoClave = document.createElement("span");
+    glifoClave.className = "glifo-clave";
+    glifoClave.title = clave === "fa" ? "Clave de Fa" : "Clave de Sol";
+    glifoClave.textContent = clave === "fa" ? "𝄢" : "𝄞";
+
     const contador = document.createElement("span");
     contador.className = "contador";
     contador.textContent = `${veces} ${veces === 1 ? "fallo" : "fallos"}`;
 
     li.appendChild(medalla);
     li.appendChild(pildora);
+    li.appendChild(glifoClave);
     if (indice === 0) {
       const fuego = document.createElement("span");
       fuego.className = "fuego";
@@ -1021,6 +1159,7 @@ function reiniciarMarcadores() {
 cargarEstado();
 aplicarTema();
 actualizarBotonSonido();
+document.getElementById("selectorClave").value = claveActual;
 canvas.addEventListener("animationend", () => canvas.classList.remove("agitar"));
 canvas.addEventListener("click", (e) => {
   if (!notaActual) return;
@@ -1033,6 +1172,9 @@ canvas.addEventListener("click", (e) => {
   if (Math.hypot(mx - centerX, my - ny) <= radioNota + 8) reproducirNota();
 });
 configurarEntradaTeclado();
+document
+  .getElementById("selectorClave")
+  .addEventListener("change", cambiarClave);
 renderProgreso();
 actualizarVisibilidadCompartir();
 if (modoCronometro) {
@@ -1048,7 +1190,8 @@ if (modoCronometro) {
 nuevaNota();
 
 // Enfocar el input si se hace clic en cualquier parte del documento
-document.addEventListener("click", () => {
+document.addEventListener("click", (e) => {
+  if (e.target.closest("select")) return;
   enfocar();
 });
 
@@ -1059,6 +1202,7 @@ window.addEventListener("focus", () => {
 
 function enfocar() {
   if (!esMovil) {
-    entradaNota.focus();
+    // preventScroll: evita que el navegador haga scroll hasta el input oculto
+    entradaNota.focus({ preventScroll: true });
   }
 }

@@ -5,39 +5,53 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>¿Qué nota es?</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="Juego para aprender a leer notas en el pentagrama. Adivina la nota, mejora tu precisión y compite contra el reloj." />
+  <meta name="theme-color" content="#1f1f1f" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="¿Qué nota es esta?" />
+  <meta property="og:description" content="Adivina la nota en el pentagrama y mejora tu precisión. Con modo contrarreloj." />
+  <meta property="og:url" content="https://danicj.github.io/adivina-nota/" />
+  <meta property="og:image" content="https://danicj.github.io/adivina-nota/favicon.svg" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 
 <body data-theme="light">
   <header class="cabecera">
     <h1>¿Qué nota es esta?</h1>
     <div class="acciones">
-      <button id="btnSonido" onclick="toggleSonido()" title="Activar/desactivar sonido">🔊</button>
-      <button id="btnTema" onclick="toggleTema()" title="Cambiar tema">🌙</button>
-      <button id="btnCrono" onclick="toggleCronometro()" title="Modo contrarreloj">⏱️</button>
+      <button id="btnSonido" onclick="toggleSonido()" title="Activar/desactivar sonido" aria-label="Activar o desactivar sonido">🔊</button>
+      <button id="btnTema" onclick="toggleTema()" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+      <button id="btnCrono" onclick="toggleCronometro()" title="Modo contrarreloj" aria-label="Modo contrarreloj">⏱️</button>
     </div>
   </header>
 
+  <div class="configuracion">
+    <label for="selectorClave">Clave</label>
+    <select id="selectorClave" title="Clave musical">
+      <option value="sol">Sol</option>
+      <option value="fa">Fa</option>
+    </select>
+    <button id="btnReproducir" onclick="reproducirNota()" title="Escuchar la nota actual" aria-label="Reproducir la nota actual">🔊 Reproducir nota</button>
+  </div>
+
   <div class="pentagrama-contenedor">
-    <canvas id="pentagrama" width="360" height="280"></canvas>
+    <canvas id="pentagrama" width="360" height="280" role="img" aria-label="Pentagrama"></canvas>
     <span id="cronoMini" class="crono-mini oculto">0:00.0</span>
   </div>
 
   <div class="botones">
-    <button onclick="verificar('Do')">Do</button>
-    <button onclick="verificar('Re')">Re</button>
-    <button onclick="verificar('Mi')">Mi</button>
-    <button onclick="verificar('Fa')">Fa</button>
-    <button onclick="verificar('Sol')">Sol</button>
-    <button onclick="verificar('La')">La</button>
-    <button onclick="verificar('Si')">Si</button>
+    <button data-nota="Do" onclick="verificar('Do')">Do</button>
+    <button data-nota="Re" onclick="verificar('Re')">Re</button>
+    <button data-nota="Mi" onclick="verificar('Mi')">Mi</button>
+    <button data-nota="Fa" onclick="verificar('Fa')">Fa</button>
+    <button data-nota="Sol" onclick="verificar('Sol')">Sol</button>
+    <button data-nota="La" onclick="verificar('La')">La</button>
+    <button data-nota="Si" onclick="verificar('Si')">Si</button>
   </div>
 
-  <!-- <input type="text" id="entradaNota" autocomplete="off" placeholder="Escribe una nota..." style="margin-top:10px; font-size:18px; padding:5px;"> -->
-
   <input type="text" id="entradaNota" autocomplete="off" style="position:absolute; top:-100px; left:-100px; opacity:0;">
-
-
 
   <div id="resultado"></div>
 
@@ -59,7 +73,7 @@
     🏆 Mejor racha: <span id="contadorMejorRacha">0</span>
   </div>
 
-  <button id="btnReiniciar" onclick="reiniciarMarcadores()">Reiniciar marcadores</button>
+  <button id="btnReiniciar" onclick="reiniciarMarcadores()" aria-label="Reiniciar marcadores">Reiniciar marcadores</button>
   <div class="acciones-compartir">
     <button id="btnCompartir" class="oculto" onclick="compartirResultados()">📤 Compartir resultados</button>
   </div>
@@ -75,7 +89,7 @@
     <ul id="listaErrores"></ul>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=5"></script>
 </body>
 
 </html>
